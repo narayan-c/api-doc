@@ -1,0 +1,477 @@
+openapi: 3.0.3
+info:
+  title: PuzzleMe API
+  version: 1.0.0
+  description: |
+    The PuzzleMe API offers secure, efficient programmatic access to puzzles created on the PuzzleMe platform and their analytics. Designed for partners and developers, this API enables seamless integration of puzzle content and analytics dashboards into your applications and platforms.
+
+    With these APIs, you can:
+
+      - Access puzzles you have created on the PuzzleMe platform.
+      - Retrieve detailed analytics about how your puzzles are played on PuzzleMe.
+
+    **Getting Started**
+    To use these APIs, you will need authentication credentials `client_id` and `client_secret`. You can obtain these by contacting product-support@amuselabs.com
+
+    **Metering**
+    We are in the process of introducing usage-based metering for this API suite. While metering is not currently active, we encourage you to design your integration with this in mind. Once metering is enabled, you may be subject to usage limits and billing based on your API consumption.
+servers:
+  - url: https://staging.amuselabs.com/api-beta
+tags:
+  - name: Auth
+    x-displayName: Auth
+  - name: Puzzles
+    x-displayName: Puzzles
+  - name: Plays
+    x-displayName: Plays
+  - name: Analytics
+    x-displayName: Analytics
+paths:
+  /api/v1/leaderboard:
+    get:
+      summary: Get leaderboard for a puzzle
+      description: >
+        Returns leaderboard entries for a given puzzle in a series.
+      parameters:
+        - name: dataJson
+          in: query
+          required: true
+          schema:
+            type: string
+          description: JSON object containing set, id, limit, useServerTime
+      responses:
+        '200':
+          description: Leaderboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardResult'
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '401':
+          description: Unauthorized (not authenticated)
+        '403':
+          description: Forbidden (no permission)
+      security:
+        - bearerAuth: []
+      tags:
+        - Plays
+  /api/v1/puzzles:
+    get:
+      summary: Retrieve puzzle metadata
+      description: |
+        Retrieves puzzle metadata based on specific criteria. Supports two mutually exclusive request types:
+
+        **1. Specific Puzzle Request:**
+        Returns metadata for a single puzzle.
+        - Requires `series` and `id`.
+
+        **2. Time Range Request:**
+        Returns a list of puzzles within a given time range, sorted by publish time in descending order (newest first).
+        - Requires `series`.
+        - `from` and `to` define the time range (both must be in ISO 8601 format with a timezone offset).
+        - `limit` and `offset` can be used for pagination.
+      parameters:
+        - name: series
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Series identifier
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Puzzle ID (for specific puzzle request)
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 'Publish time start range (ISO_OFFSET_DATE_TIME format, inclusive). Defaults to 2013-01-01T00:00:00Z if not specified.'
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 'Publish time end range (ISO_OFFSET_DATE_TIME format, exclusive). Defaults to the current time if not specified.'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            maximum: 14
+          description: Maximum number of puzzles to return
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Number of puzzles to skip from the start
+      responses:
+        '200':
+          description: Successful response with puzzle metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PuzzleResponseAPI'
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '401':
+          description: Unauthorized (invalid or missing API token)
+        '403':
+          description: Forbidden (no access to series)
+      security:
+        - bearerAuth: []
+      tags:
+        - Puzzles
+  /api/v1/reporting:
+    get:
+      summary: Get series or puzzle specific aggregate metrics
+      description: >
+        Returns analytics metrics for a series or a specific puzzle, grouped by
+          specified dimensions.
+      parameters:
+        - name: series
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Puzzle ID (for puzzle-specific report)
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Start date (ISO 8601)
+        - name: duration
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 28
+          description: Duration in days
+        - name: dimensions
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Comma-separated list of dimensions
+        - name: metrics
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Comma-separated list of metrics
+      responses:
+        '200':
+          description: Analytics report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponseAPI'
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '401':
+          description: Unauthorized (invalid or missing API token)
+        '403':
+          description: Forbidden (no access to series)
+      security:
+        - bearerAuth: []
+      tags:
+        - Plays
+  /api/v1/token:
+    post:
+      summary: Generate API token
+      description: >
+        Returns a JWT token for API access. Requires client_id and client_secret
+        in the request body.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResult'
+        '400':
+          description: Bad request (missing/invalid credentials)
+      tags:
+        - Auth
+  /api/v1/plays:
+    get:
+      summary: Get plays for a series, puzzle, or user
+      description: |
+        Returns plays for a puzzle, a user in a series, or a user in a puzzle.
+        Response format varies by authentication method.
+      parameters:
+        - name: series
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Series identifier
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Puzzle ID (for puzzle-specific or user-in-puzzle queries)
+        - name: uid
+          in: query
+          required: false
+          schema:
+            type: string
+          description: User ID (for user-in-series or user-in-puzzle queries)
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Start time (ISO 8601)
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: End time (ISO 8601)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+          description: Maximum number of plays to return
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Number of plays to skip from the start
+        - name: playState
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by play state
+        - name: verbose
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Include verbose details
+        - name: getUserInfo
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Include user info in response
+      security:
+        - bearerAuth: []
+      tags:
+        - Plays
+      responses:
+        '200':
+          description: List of plays and metadata
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PlaysResponseAPI'
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '401':
+          description: Unauthorized (invalid or missing API token)
+        '403':
+          description: Forbidden (no access to series)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    PlaysResponseAPI:
+      type: object
+      properties:
+        plays:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseFormattedPlay'
+        hasMore:
+          type: boolean
+    BaseFormattedPlay:
+      type: object
+      properties:
+        uid:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        playState:
+          type: string
+        puzzleId:
+          type: string
+        series:
+          type: string
+        puzzleType:
+          type: string
+        timeTaken:
+          type: string
+        score:
+          type: integer
+    LeaderboardResult:
+      type: object
+      properties:
+        leaderboard:
+          type: object
+          properties:
+            id:
+              type: string
+            set:
+              type: string
+            title:
+              type: string
+            useServerTime:
+              type: boolean
+            plays:
+              type: array
+              items:
+                $ref: '#/components/schemas/LeaderboardPlay'
+    LeaderboardPlay:
+      type: object
+      properties:
+        userId:
+          type: string
+        score:
+          type: integer
+        time:
+          type: integer
+    PuzzleResponseAPI:
+      type: object
+      properties:
+        seriesToPuzzleMetadata:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              oneOf:
+                - $ref: '#/components/schemas/GridGameMetadata'
+                - $ref: '#/components/schemas/QuizGameMetadata'
+                - $ref: '#/components/schemas/BaseFormattedPuzzleMetadata'
+    BaseFormattedPuzzleMetadata:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        puzzleId:
+          type: string
+        puzzleType:
+          type: string
+        publicationTime:
+          type: integer
+        publicationTimeZone:
+          type: string
+        thumbnailURL:
+          type: string
+    GridGameMetadata:
+      allOf:
+        - $ref: '#/components/schemas/BaseFormattedPuzzleMetadata'
+        - type: object
+          properties:
+            gridWidth:
+              type: integer
+              description: The width of the puzzle grid.
+            gridHeight:
+              type: integer
+              description: The height of the puzzle grid.
+    QuizGameMetadata:
+      allOf:
+        - $ref: '#/components/schemas/BaseFormattedPuzzleMetadata'
+        - type: object
+          properties:
+            numOfQuestions:
+              type: integer
+              description: The number of questions in the quiz.
+    PuzzleMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        puzzleType:
+          type: string
+        publishTime:
+          type: integer
+        publishTimeZone:
+          type: string
+        tn_url:
+          type: string
+    ReportResponseAPI:
+      type: object
+      properties:
+        series:
+          type: string
+        puzzleId:
+          type: string
+          nullable: true
+        loadMetrics:
+          type: object
+          nullable: true
+        playMetrics:
+          type: object
+          nullable: true
+    TokenResult:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_at_seconds:
+          type: integer
+x-tagGroups:
+  - name: Auth
+    tags:
+      - Auth
+  - name: Puzzles
+    tags:
+      - Puzzles
+  - name: Plays
+    tags:
+      - Plays
+  - name: Analytics
+    tags:
+      - Analytics

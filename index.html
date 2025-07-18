@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PuzzleMe API Documentation</title>
+
+  <!-- Google Font for Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Stoplight Elements Web Components -->
+  <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css"/>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #0055CC;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 28px;
+      margin-right: 12px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+      background-color: #f0f0f0;
+    }
+
+    elements-api {
+      --theme-primary: #0055CC;
+      --theme-text-primary: #333;
+      --theme-background: #ffffff;
+      --theme-secondary: #F5F8FA;
+      --theme-border-radius: 8px;
+    }
+
+    /* Extra Styling for Content Area */
+    elements-api::part(content) {
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    elements-api::part(navigation) {
+      background-color: #F5F8FA;
+    }
+
+    elements-api::part(nav-link):hover {
+      color: #0055CC;
+    }
+
+    elements-api::part(nav-link-active) {
+      font-weight: 600;
+      border-left: 3px solid #0055CC;
+    }
+
+    pre code {
+      background: #F5F5F5;
+      border-radius: 4px;
+      padding: 0.5rem;
+      display: block;
+    }
+
+    /* Optional: Callout Styling */
+    .notice {
+      border-left: 4px solid #0055CC;
+      background-color: #E8F4FF;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="https://puzzleme.amuselabs.com/pmm/images/puzzleme-logo.svg" alt="Amuse Labs"/>
+    PuzzleMe API Documentation
+  </header>
+
+  <elements-api 
+  apiDescriptionUrl="combined-openapi.json"
+  router="hash"
+  layout="sidebar"
+/>
+
+  <footer>
+    © 2025 Amuse Labs. All rights reserved.
+  </footer>
+</body>
+</html>
