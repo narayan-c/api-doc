@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Puzzle Plays Analytics API",
+    "title": "PuzzleMe API",
     "version": "1.0.0",
     "description": "The PuzzleMe API offers secure, efficient programmatic access to puzzles created on the PuzzleMe platform and their analytics. Designed for partners and developers, this API enables seamless integration of puzzle content and analytics dashboards into your applications and platforms.\n\nWith these APIs, you can:\n\n  - Access puzzles you have created on the PuzzleMe platform.\n  - Retrieve detailed analytics about how your puzzles are played on PuzzleMe.\n\n**Getting Started**\nTo use these APIs, you will need authentication credentials `client_id` and `client_secret`. You can obtain these by contacting product-support@amuselabs.com\n\n**Metering**\nWe are in the process of introducing usage-based metering for this API suite. While metering is not currently active, we encourage you to design your integration with this in mind. Once metering is enabled, you may be subject to usage limits and billing based on your API consumption.\n"
   },
@@ -78,7 +78,7 @@
     "/api/v1/puzzles": {
       "get": {
         "summary": "Retrieve puzzle metadata",
-        "description": "Returns puzzle metadata for a specific puzzle or a list of puzzles in a time range.\n",
+        "description": "Retrieves puzzle metadata based on specific criteria. Supports two mutually exclusive request types:\n\n**1. Specific Puzzle Request:**\nReturns metadata for a single puzzle.\n- Requires `series` and `id`.\n\n**2. Time Range Request:**\nReturns a list of puzzles within a given time range, sorted by publish time in descending order (newest first).\n- Requires `series`.\n- `from` and `to` define the time range (both must be in ISO 8601 format with a timezone offset).\n- `limit` and `offset` can be used for pagination.\n",
         "parameters": [
           {
             "name": "series",
@@ -106,7 +106,7 @@
               "type": "string",
               "format": "date-time"
             },
-            "description": "Publish time start range (ISO_OFFSET_DATE_TIME)"
+            "description": "Publish time start range (ISO_OFFSET_DATE_TIME format, inclusive). Defaults to 2013-01-01T00:00:00Z if not specified."
           },
           {
             "name": "to",
@@ -116,7 +116,7 @@
               "type": "string",
               "format": "date-time"
             },
-            "description": "Publish time end range (ISO_OFFSET_DATE_TIME)"
+            "description": "Publish time end range (ISO_OFFSET_DATE_TIME format, exclusive). Defaults to the current time if not specified."
           },
           {
             "name": "limit",
@@ -146,11 +146,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/PuzzleResponseAPI"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/PuzzleResponseAPI"
                 }
               }
             }
@@ -552,7 +548,17 @@
             "additionalProperties": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/BaseFormattedPuzzleMetadata"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GridGameMetadata"
+                  },
+                  {
+                    "$ref": "#/components/schemas/QuizGameMetadata"
+                  },
+                  {
+                    "$ref": "#/components/schemas/BaseFormattedPuzzleMetadata"
+                  }
+                ]
               }
             }
           }
@@ -583,6 +589,42 @@
             "type": "string"
           }
         }
+      },
+      "GridGameMetadata": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseFormattedPuzzleMetadata"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gridWidth": {
+                "type": "integer",
+                "description": "The width of the puzzle grid."
+              },
+              "gridHeight": {
+                "type": "integer",
+                "description": "The height of the puzzle grid."
+              }
+            }
+          }
+        ]
+      },
+      "QuizGameMetadata": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseFormattedPuzzleMetadata"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "numOfQuestions": {
+                "type": "integer",
+                "description": "The number of questions in the quiz."
+              }
+            }
+          }
+        ]
       },
       "PuzzleMetadata": {
         "type": "object",
