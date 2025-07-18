@@ -32,21 +32,51 @@
     "/api/v1/leaderboard": {
       "get": {
         "summary": "Get leaderboard for a puzzle",
-        "description": "Returns leaderboard entries for a given puzzle in a series.\n",
+        "description": "Retrieves a list of top plays for a specific puzzle, sorted by score and time.\nThe endpoint supports both session-based and API token authentication.\n",
         "parameters": [
           {
-            "name": "dataJson",
+            "name": "set",
             "in": "query",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "JSON object containing set, id, limit, useServerTime"
+            "description": "The series identifier for the puzzle."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The puzzle ID for which to retrieve the leaderboard."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 100
+            },
+            "description": "The maximum number of leaderboard entries to return."
+          },
+          {
+            "name": "useServerTime",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "If true, uses server time for the leaderboard. Automatically enabled for contest mode puzzles."
           }
         ],
         "responses": {
           "200": {
-            "description": "Leaderboard data",
+            "description": "A JSON object containing the leaderboard data.",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,13 +86,16 @@
             }
           },
           "400": {
-            "description": "Bad request (missing/invalid parameters)"
+            "description": "Bad Request - Missing or invalid `set` or `id` parameters."
           },
           "401": {
-            "description": "Unauthorized (not authenticated)"
+            "description": "Unauthorized - Missing or invalid authentication credentials."
           },
           "403": {
-            "description": "Forbidden (no permission)"
+            "description": "Forbidden - The user does not have permission to view the leaderboard for this series."
+          },
+          "404": {
+            "description": "Not Found - The puzzle with the specified `id` was not found in the given `set`."
           }
         },
         "security": [
@@ -174,7 +207,7 @@
     "/api/v1/reporting": {
       "get": {
         "summary": "Get series or puzzle specific aggregate metrics",
-        "description": "Returns analytics metrics for a series or a specific puzzle, grouped by\n  specified dimensions.\n",
+        "description": "Fetches aggregated analytics data over a specified time range, grouped by one or more dimensions.\nThe reporting system is designed around two types of data: **loads** (when a puzzle is loaded) and **plays** (when a user interacts with a puzzle). You must choose dimensions and metrics that belong to the same category.\n",
         "parameters": [
           {
             "name": "series",
@@ -182,7 +215,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Series identifier"
           },
           {
             "name": "id",
@@ -201,7 +235,7 @@
               "type": "string",
               "format": "date-time"
             },
-            "description": "Start date (ISO 8601)"
+            "description": "The start date for the report in ISO 8601 format (e.g., `2024-07-01T00:00:00Z`). UTC is assumed if no timezone is specified."
           },
           {
             "name": "duration",
@@ -221,7 +255,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Comma-separated list of dimensions"
+            "description": "A comma-separated list of dimensions to group the data by.\n**Load Dimensions:** `DAY`, `LOAD_TYPE`, `AD_STATE`, `LOGIN_STATUS`, `DEVICE`, `BROWSER`, `OS`.\n**Play Dimensions:** `DAY`, `PLAY_STATE`, `PUZZLE_TYPE`.\n"
           },
           {
             "name": "metrics",
@@ -230,12 +264,12 @@
             "schema": {
               "type": "string"
             },
-            "description": "Comma-separated list of metrics"
+            "description": "A comma-separated list of metrics to compute. Must be either all load or all play metrics.\n**Load Metrics:** `TOTAL_LOADS`, `VERIFIED_LOADS`, `AVG_AD_DURATION`.\n**Play Metrics:** `TOTAL_PLAYS`, `UNIQUE_PLAYS`, `UNIQUE_USERS`, `AVG_SCORE`, `MAX_SCORE`.\n"
           }
         ],
         "responses": {
           "200": {
-            "description": "Analytics report",
+            "description": "A JSON object containing the requested metrics, grouped by the specified dimensions.",
             "content": {
               "application/json": {
                 "schema": {
@@ -245,13 +279,13 @@
             }
           },
           "400": {
-            "description": "Bad request (missing/invalid parameters)"
+            "description": "Bad Request - Missing required parameters or inconsistent parameters (e.g., requesting load metrics with play dimensions)."
           },
           "401": {
-            "description": "Unauthorized (invalid or missing API token)"
+            "description": "Unauthorized - Missing or invalid API token."
           },
           "403": {
-            "description": "Forbidden (no access to series)"
+            "description": "Forbidden - The user does not have permission to access the requested series."
           }
         },
         "security": [
