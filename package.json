@@ -1,0 +1,24 @@
+{
+  "name": "api-doc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "redocly bundle combined-openapi.yml -o combined-openapi.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/narayan-c/api-doc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@redocly/cli": "^1.34.4"
+  },
+  "bugs": {
+    "url": "https://github.com/narayan-c/api-doc/issues"
+  },
+  "homepage": "https://github.com/narayan-c/api-doc#readme"
+}
