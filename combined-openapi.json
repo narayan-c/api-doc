@@ -253,8 +253,24 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "DAY",
+                  "LOAD_TYPE",
+                  "AD_STATE",
+                  "LOGIN_STATUS",
+                  "DEVICE",
+                  "BROWSER",
+                  "OS",
+                  "PLAY_STATE",
+                  "PUZZLE_TYPE"
+                ]
+              }
             },
+            "style": "form",
+            "explode": false,
             "description": "A comma-separated list of dimensions to group the data by.\n**Load Dimensions:** `DAY`, `LOAD_TYPE`, `AD_STATE`, `LOGIN_STATUS`, `DEVICE`, `BROWSER`, `OS`.\n**Play Dimensions:** `DAY`, `PLAY_STATE`, `PUZZLE_TYPE`.\n"
           },
           {
@@ -262,8 +278,23 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "TOTAL_LOADS",
+                  "VERIFIED_LOADS",
+                  "AVG_AD_DURATION",
+                  "TOTAL_PLAYS",
+                  "UNIQUE_PLAYS",
+                  "UNIQUE_USERS",
+                  "AVG_SCORE",
+                  "MAX_SCORE"
+                ]
+              }
             },
+            "style": "form",
+            "explode": false,
             "description": "A comma-separated list of metrics to compute. Must be either all load or all play metrics.\n**Load Metrics:** `TOTAL_LOADS`, `VERIFIED_LOADS`, `AVG_AD_DURATION`.\n**Play Metrics:** `TOTAL_PLAYS`, `UNIQUE_PLAYS`, `UNIQUE_USERS`, `AVG_SCORE`, `MAX_SCORE`.\n"
           }
         ],
@@ -482,7 +513,8 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "description": "Enter the JWT token obtained from the `/api/v1/token` endpoint.\n**Note:** You do not need to prefix the token with \"Bearer \".\n"
       }
     },
     "schemas": {
