@@ -270,7 +270,7 @@
               }
             },
             "style": "form",
-            "explode": false,
+            "explode": true,
             "description": "A comma-separated list of dimensions to group the data by.\n**Load Dimensions:** `DAY`, `LOAD_TYPE`, `AD_STATE`, `LOGIN_STATUS`, `DEVICE`, `BROWSER`, `OS`.\n**Play Dimensions:** `DAY`, `PLAY_STATE`, `PUZZLE_TYPE`.\n"
           },
           {
