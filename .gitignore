@@ -1,5 +1,4 @@
 .docusaurus
-static
 yarn.lock
 package-lock.json
 node_modules
