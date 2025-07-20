@@ -1,46 +1,41 @@
-# API Documentation Workflow
+# Website
 
-This document outlines the process for updating and viewing the API documentation for the PuzzleMe API.
+This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
-## Iterating on the API Documentation
-
-Follow these steps to make changes to the API documentation:
-
-### 1. Modify the OpenAPI Spec
-
-All API endpoints, schemas, and descriptions are defined in the `combined-openapi.yml` file. Open this file to make any necessary changes, such as:
-- Adding or updating API endpoints.
-- Modifying request or response schemas.
-- Improving descriptions and examples.
-
-### 2. Build the Documentation
-
-Once you have saved your changes to the `.yml` file, you need to bundle it into a single JSON file that can be rendered in the browser.
-
-Run the following command from within the `api-doc` directory:
+## Installation
 
 ```bash
-npm run build
+yarn
 ```
 
-This command executes the `build` script in `package.json`, which uses Redocly to bundle `combined-openapi.yml` and outputs the result to `combined-openapi.json`. This JSON file is then referenced by `index.html` to render the documentation page.
+## Local Development
 
-### 3. View the Documentation
+```bash
+yarn start
+```
 
-After building the spec, you can view the rendered API documentation by opening the `index.html` file in your browser. This file will now reflect the changes you made.
+This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
-## Recommended Tooling for VS Code / Cursor
+## Build
 
-To make it easier to work with OpenAPI files, we highly recommend installing the **42Crunch OpenAPI (Swagger) Editor** extension.
+```bash
+yarn build
+```
 
-- **Extension Name:** 42Crunch.vscode-openapi
-- **Marketplace Link:** [42Crunch OpenAPI (Swagger) Editor](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
-This extension provides valuable features like:
-- Live preview of your OpenAPI spec as you type.
-- Intellisense for autocompleting fields.
-- A tree view for easy navigation of your spec.
-- Validation to catch errors in your YAML.
+## Deployment
 
-For more information on how to use this extension effectively, check out the tutorials available at the following link:
-- **Tutorials and Videos:** [OpenAPI Swagger Editor Extension in VS Code](https://42crunch.com/tutorial-openapi-swagger-extension-vs-code/#Introducing-OpenAPI-Editor)
+Using SSH:
+
+```bash
+USE_SSH=true yarn deploy
+```
+
+Not using SSH:
+
+```bash
+GIT_USER=<Your GitHub username> yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
