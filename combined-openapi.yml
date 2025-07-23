@@ -43,11 +43,10 @@ paths:
         - Timestamps are rounded to the nearest second (contest mode) or minute (non-contest mode).
 
         **Use Cases:**
-        - **Contest Leaderboard:** Show only plays submitted during a contest window using `from` and `to`.
-        - **Daily/Weekly Leaderboard:** Filter plays for a specific day or week.
-        - **Historical Analysis:** Compare performance across different time ranges.
-        - **Live Monitoring:** Show leaderboard for currently active submissions.
-        - **Post-Contest:** Freeze leaderboard at contest end by setting `to` to contest end time.
+        - **Daily/Weekly Leaderboard:** Filter plays for a specific day or week using `from` and `to` parameters. For example, get all plays submitted on January 15th, 2024.
+        - **Contest Completion:** When a contest ends, use `to` parameter to freeze the leaderboard at the contest end time, ensuring no plays submitted after the contest are included.
+        - **Historical Analysis:** Compare performance across different time ranges by using different `from`/`to` combinations.
+        - **Post-Contest Analysis:** After a contest ends, analyze only contest submissions by combining `contestSubmissionsOnly=true` with the contest time window.
       parameters:
         - name: set
           in: query
@@ -90,6 +89,13 @@ paths:
             type: string
             format: date-time
           description: 'Submission time end range (ISO 8601, inclusive). Rounded to nearest second (contest) or minute (non-contest).'
+        - name: contestSubmissionsOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, only includes plays with SUBMITTED state (contest submissions). Default is false.
       responses:
         '200':
           description: A JSON object containing the leaderboard data.
