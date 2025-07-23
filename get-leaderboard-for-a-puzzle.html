@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Get leaderboard for a puzzle | PuzzleMe API</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://narayan-c.github.io/api-doc/img/puzzleme-logo.svg"><meta data-rh="true" name="twitter:image" content="https://narayan-c.github.io/api-doc/img/puzzleme-logo.svg"><meta data-rh="true" property="og:url" content="https://narayan-c.github.io/api-doc/get-leaderboard-for-a-puzzle"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Get leaderboard for a puzzle | PuzzleMe API"><meta data-rh="true" name="description" content="Retrieves a list of top plays for a specific puzzle, sorted by score and time."><meta data-rh="true" property="og:description" content="Retrieves a list of top plays for a specific puzzle, sorted by score and time."><link data-rh="true" rel="icon" href="/api-doc/img/puzzleme-logo.svg"><link data-rh="true" rel="canonical" href="https://narayan-c.github.io/api-doc/get-leaderboard-for-a-puzzle"><link data-rh="true" rel="alternate" href="https://narayan-c.github.io/api-doc/get-leaderboard-for-a-puzzle" hreflang="en"><link data-rh="true" rel="alternate" href="https://narayan-c.github.io/api-doc/get-leaderboard-for-a-puzzle" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Get leaderboard for a puzzle","item":"https://narayan-c.github.io/api-doc/get-leaderboard-for-a-puzzle"}]}</script><link rel="stylesheet" href="/api-doc/assets/css/styles.1c9d16c8.css">
-<script src="/api-doc/assets/js/runtime~main.f847bdfe.js" defer="defer"></script>
+<script src="/api-doc/assets/js/runtime~main.743b5aba.js" defer="defer"></script>
 <script src="/api-doc/assets/js/main.e6357ea6.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -15,6 +15,23 @@
 <pre class="openapi__method-endpoint"><span class="badge badge--primary">GET</span> <h2 class="openapi__method-endpoint-path">/api/v1/leaderboard</h2></pre><div class="openapi__divider"></div>
 <p>Retrieves a list of top plays for a specific puzzle, sorted by score and time.
 The endpoint supports both session-based and API token authentication.</p>
+<p><strong>Time Range Filtering</strong></p>
+<ul>
+<li>Use <code>from</code> (inclusive) and/or <code>to</code> (inclusive) to filter plays by submission time (ISO 8601 format).</li>
+<li>If neither is provided, all plays are considered.</li>
+<li>If only <code>from</code> is provided, plays from that time onwards are considered.</li>
+<li>If only <code>to</code> is provided, plays up to that time are considered.</li>
+<li>If both are provided, plays between <code>from</code> and <code>to</code> (inclusive) are considered.</li>
+<li>Timestamps are rounded to the nearest second (contest mode) or minute (non-contest mode).</li>
+</ul>
+<p><strong>Use Cases:</strong></p>
+<ul>
+<li><strong>Contest Leaderboard:</strong> Show only plays submitted during a contest window using <code>from</code> and <code>to</code>.</li>
+<li><strong>Daily/Weekly Leaderboard:</strong> Filter plays for a specific day or week.</li>
+<li><strong>Historical Analysis:</strong> Compare performance across different time ranges.</li>
+<li><strong>Live Monitoring:</strong> Show leaderboard for currently active submissions.</li>
+<li><strong>Post-Contest:</strong> Freeze leaderboard at contest end by setting <code>to</code> to contest end time.</li>
+</ul>
 <h2 class="anchor anchorWithStickyNavbar_LWe7 openapi-tabs__heading" id="request">Request<a href="#request" class="hash-link" aria-label="Direct link to Request" title="Direct link to Request">​</a></h2>
 <div class="openapi-skeleton sm"></div>
 <div class="openapi-skeleton sm"></div>
