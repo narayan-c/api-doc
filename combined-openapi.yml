@@ -33,6 +33,21 @@ paths:
       description: |
         Retrieves a list of top plays for a specific puzzle, sorted by score and time.
         The endpoint supports both session-based and API token authentication.
+
+        **Time Range Filtering**
+        - Use `from` (inclusive) and/or `to` (inclusive) to filter plays by submission time (ISO 8601 format).
+        - If neither is provided, all plays are considered.
+        - If only `from` is provided, plays from that time onwards are considered.
+        - If only `to` is provided, plays up to that time are considered.
+        - If both are provided, plays between `from` and `to` (inclusive) are considered.
+        - Timestamps are rounded to the nearest second (contest mode) or minute (non-contest mode).
+
+        **Use Cases:**
+        - **Contest Leaderboard:** Show only plays submitted during a contest window using `from` and `to`.
+        - **Daily/Weekly Leaderboard:** Filter plays for a specific day or week.
+        - **Historical Analysis:** Compare performance across different time ranges.
+        - **Live Monitoring:** Show leaderboard for currently active submissions.
+        - **Post-Contest:** Freeze leaderboard at contest end by setting `to` to contest end time.
       parameters:
         - name: set
           in: query
@@ -61,6 +76,20 @@ paths:
             type: boolean
             default: false
           description: If true, uses server time for the leaderboard. Automatically enabled for contest mode puzzles.
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 'Submission time start range (ISO 8601, inclusive). Rounded to nearest second (contest) or minute (non-contest).'
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 'Submission time end range (ISO 8601, inclusive). Rounded to nearest second (contest) or minute (non-contest).'
       responses:
         '200':
           description: A JSON object containing the leaderboard data.
